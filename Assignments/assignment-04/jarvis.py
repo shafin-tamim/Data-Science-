@@ -8,7 +8,7 @@ import webbrowser
 import random 
 import subprocess 
 import google.generativeai as genai 
-
+from dotenv import load_dotenv
 
 
 # Configure logging
@@ -24,6 +24,15 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     level=logging.INFO
     )
+
+# Load environment variables
+load_dotenv()
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    raise ValueError("GOOGLE_API_KEY not found in environment variables")
+genai.configure(api_key=api_key)
+logging.info("Environment variables loaded successfully.")  
+
 
 # Initialize text-to-speech engine
 engine = pyttsx3.init('sapi5')
@@ -69,6 +78,16 @@ def wish_me():
     speak("I am Jarvis. How may I assist you today?")
 
 
+def gemini_model_response(user_input):
+    GEMINI_API_KEY = api_key
+    genai.configure(api_key=GEMINI_API_KEY) 
+    model = genai.GenerativeModel("gemini-2.5-flash") 
+    prompt = f"Your name is JARVIS, You act like JARVIS. Answar the provided question in short, Question: {user_input}"
+    response = model.generate_content(prompt)
+    result = response.text
+
+    return result
+
 wish_me()
 
 while True:
@@ -83,7 +102,7 @@ while True:
         logging.info("User asked for current time.")
 
     
-    # Small talk
+
     elif "how are you" in query:
         speak("I am functioning at full capacity sir!")
         logging.info("User asked about assistant's well-being.")
@@ -105,25 +124,18 @@ while True:
         logging.info("User requested to open Google.")
 
         
-    # Calculator
+ 
     elif "open calculator" in query or "calculator" in query:
         speak("Opening calculator")
         subprocess.Popen("calc.exe")
         logging.info("User requested to open Calculator.")
 
         
-    # Notepad
+
     elif "open notepad" in query:
         speak("Opening Notepad")
         subprocess.Popen("notepad.exe")
         logging.info("User requested to open Notepad.")
-
-        
-     # Command Prompt
-    elif "open terminal" in query or "open cmd" in query:
-        speak("Opening Command Prompt terminal")
-        subprocess.Popen("cmd.exe")
-        logging.info("User requested to open Command Prompt.")
 
         
     # Calendar
@@ -133,7 +145,7 @@ while True:
         logging.info("User requested to open Calendar.")
 
         
-    # YouTube search
+  
     elif "youtube" in query:
         speak("Opening YouTube for you.")
         query = query.replace("youtube", "")
@@ -153,8 +165,12 @@ while True:
         logging.info("User requested to open GitHub.")
 
 
-        
-    # Jokes
+    elif "open linkedin" in query:
+        speak("ok sir. opening linkedin")
+        webbrowser.open("linkedin.com")
+        logging.info("User requested to open GitHub.")
+   
+
     elif "joke" in query:
         jokes = [
                 "Why don't programmers like nature? Too many bugs.",
@@ -173,10 +189,17 @@ while True:
         speak(results)
         logging.info("User requested information from Wikipedia.")
 
+
     elif "exit" in query or "quit" in query or "stop" in query:
             speak("Goodbye sir! Have a great day.")
             logging.info("User requested to exit the application.")
             exit()
+
+
+    else:
+        response = gemini_model_response(query)
+        speak(response)
+        logging.info("User asked for others question")
 
         
 
