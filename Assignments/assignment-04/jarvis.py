@@ -10,21 +10,6 @@ import subprocess
 import google.generativeai as genai 
 from dotenv import load_dotenv
 
-
-# Configure logging
-LOG_DIR = "logs"
-LOG_FILE_NAME = "application.log"
-
-os.makedirs(LOG_DIR, exist_ok=True)
-
-log_path = os.path.join(LOG_DIR, LOG_FILE_NAME)
-
-logging.basicConfig(
-    filename= log_path,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-    )
-
 # Load environment variables
 load_dotenv()
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -32,6 +17,22 @@ if not api_key:
     raise ValueError("GOOGLE_API_KEY not found in environment variables")
 genai.configure(api_key=api_key)
 logging.info("Environment variables loaded successfully.")  
+
+
+# Configure logging
+
+LOG_DIR = "logs"
+LOG_FILE_NAME = "application.log"
+
+os.makedirs(LOG_DIR, exist_ok=True)
+
+log_path = os.path.join(LOG_DIR,LOG_FILE_NAME)
+
+logging.basicConfig(
+    filename=log_path,
+    format = "[ %(asctime)s ] %(name)s - %(levelname)s - %(message)s",
+    level= logging.INFO
+)
 
 
 # Initialize text-to-speech engine
